@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#F6F2EA">
+<title>汪格 WOOF-TI · 你是什么狗</title>
+<style>
+  :root{--paper:#F6F2EA;--card:#FFFDF8;--ink:#22211E;--ink2:#6B675E;--ink3:#9C978B;--line:#DCD5C8;--accent:#A6462B;--soft:#EFE8DB;}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:var(--paper);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;font-weight:400;-webkit-font-smoothing:antialiased}
+  body{display:flex;justify-content:center;min-height:100vh}
+  .wrap{width:100%;max-width:560px;padding:28px 22px 60px;position:relative}
+  .serif{font-family:"Songti SC","Source Han Serif SC","Noto Serif SC",Georgia,serif;font-weight:600}
+  h1{font-size:34px;letter-spacing:.02em;line-height:1.2}
+  .sub{margin-top:10px;color:var(--ink2);font-size:14px;line-height:1.8}
+  .meta{margin-top:22px;color:var(--ink3);font-size:12px;letter-spacing:.06em}
+  .btn{display:flex;align-items:center;justify-content:center;width:100%;padding:16px;border:1px solid var(--ink);background:var(--ink);color:var(--paper);font-size:16px;font-weight:600;cursor:pointer;border-radius:2px;font-family:inherit;letter-spacing:.04em}
+  .btn:active{transform:translateY(1px)}
+  .btn.ghost{background:transparent;color:var(--ink)}
+  .actions{margin-top:26px;display:flex;flex-direction:column;gap:10px}
+  .screen{display:none}.screen.on{display:block}
+  /* quiz */
+  .bar{height:3px;background:var(--soft);border-radius:2px;overflow:hidden;margin-bottom:8px}
+  .bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s ease}
+  .qmeta{display:flex;justify-content:space-between;color:var(--ink3);font-size:12px;letter-spacing:.08em;margin-bottom:30px}
+  .scene{font-size:19px;line-height:1.75;font-weight:500}
+  .tag{margin-top:14px;color:var(--ink3);font-size:12px;letter-spacing:.1em}
+  .opts{margin-top:28px;display:flex;flex-direction:column;gap:10px}
+  .opt{text-align:left;padding:15px 16px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:15px;line-height:1.65;border-radius:2px;cursor:pointer;font-family:inherit;transition:border-color .15s,background .15s}
+  .opt:active{background:var(--soft)}
+  .opt.pick{border-color:var(--accent);background:#FBF2EE}
+  .nav{margin-top:22px;display:flex;justify-content:space-between;align-items:center;color:var(--ink3);font-size:13px}
+  .link{color:var(--ink2);text-decoration:none;cursor:pointer;border-bottom:1px solid var(--line)}
+  /* result */
+  .hero{margin-top:8px;text-align:center}
+  .disc{width:84px;height:84px;border-radius:50%;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:30px;font-weight:600}
+  .rhero{display:block;width:min(230px,58vw);height:auto;margin:0 auto 20px;border:1px solid var(--line);background:#fff}
+  #cover{display:flex;flex-direction:column;justify-content:center;min-height:76vh}
+  .why{margin-top:30px;border-top:1px solid var(--line)}
+  .why summary{padding:18px 0 4px;font-size:12px;letter-spacing:.12em;color:var(--ink3);cursor:pointer;list-style:none}
+  .why summary::-webkit-details-marker{display:none}
+  .why summary:after{content:' +';margin-left:6px}
+  .why[open] summary:after{content:' −'}
+  .why[open] summary{color:var(--ink2)}
+  .why .block{border-top:0;padding-top:14px}
+  .rname{font-size:32px;letter-spacing:.02em}
+  .rline{margin-top:8px;color:var(--ink2);font-size:15px}
+  .sim{margin-top:16px;display:inline-block;padding:6px 12px;border:1px solid var(--line);font-size:12px;color:var(--ink2);letter-spacing:.04em}
+  .block{margin-top:34px;border-top:1px solid var(--line);padding-top:20px}
+  .k{font-size:12px;letter-spacing:.14em;color:var(--ink3);margin-bottom:12px}
+  .body{font-size:15px;line-height:1.85;color:var(--ink)}
+  .risk{margin-top:12px;font-size:14px;line-height:1.75;color:var(--accent)}
+  .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+  .tg{font-size:12px;color:var(--ink2);border:1px solid var(--line);padding:3px 8px}
+  .rolebox{margin-top:22px;padding:16px;background:var(--card);border:1px solid var(--line)}
+  .rolebox b{font-size:15px}
+  .rolebox p{margin-top:8px;font-size:14px;line-height:1.75;color:var(--ink2)}
+  .dims{margin-top:8px;display:flex;flex-direction:column;gap:11px}
+  .dim{display:grid;grid-template-columns:64px 1fr 52px;gap:10px;align-items:center}
+  .dn{font-size:12px;color:var(--ink2)}
+  .track{height:6px;background:var(--soft);position:relative;border-radius:3px;overflow:visible}
+  .track:after{content:'';position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--line)}
+  .track i{position:absolute;top:0;bottom:0;left:50%;background:var(--accent);border-radius:3px}
+  .dv{font-size:11px;color:var(--ink3);text-align:right;letter-spacing:.02em}
+  .note{font-size:13px;line-height:1.8;color:var(--ink2);margin-top:10px}
+  .note b{color:var(--accent);font-weight:600}
+  .kc{margin-top:10px;padding:12px 0;border-bottom:1px solid var(--soft)}
+  .kc .t{font-size:12px;color:var(--ink3)}
+  .kc .o{font-size:14px;margin-top:4px;line-height:1.6}
+  .kc .d{font-size:12px;color:var(--accent);margin-top:4px}
+  .gcard{border-top:1px solid var(--line);padding:16px 0;display:flex;gap:14px;align-items:flex-start}
+  .gcard img{width:78px;height:104px;object-fit:cover;border:1px solid var(--line);flex:0 0 auto}
+  .gcard .gn{font-size:16px;font-weight:600}
+  .gcard .gl{font-size:13px;color:var(--ink2);margin-top:4px}
+  .foot{margin-top:40px;color:var(--ink3);font-size:11.5px;line-height:1.9}
+  .banner{margin-top:16px;padding:12px 14px;background:#F3EDE1;border-left:3px solid var(--accent);font-size:13px;line-height:1.7;color:var(--ink2)}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+const DATA = {"dims":{"anx":{"name":"关系焦虑","layer":"P","high":"对被否定敏感，需要反复确认","low":"笃定，不靠确认维持关系"},"avo":{"name":"关系回避","layer":"P","high":"暴露会不适，习惯自己消化","low":"能依赖也能被依赖"},"con":{"name":"尽责自律","layer":"P","high":"有计划、守承诺、按规则来","low":"随性，走一步看一步"},"exp":{"name":"外放表达","layer":"P","high":"情绪写在脸上，先说出来","low":"内敛，先在心里过一遍"},"agg":{"name":"宜人共情","layer":"P","high":"先想到对方，愿意让步","low":"先守住自己的立场"},"nov":{"name":"开放探索","layer":"P","high":"要新鲜感，愿意重来","low":"稳定可预期最舒服"},"exch":{"name":"交换取向","layer":"S","high":"关系讲对等与记账，按规则来","low":"关系优先，不算细账"},"pow":{"name":"权力位置","layer":"S","high":"在关系里能定规矩，不怕失去","low":"更依赖对方，怕关系破裂"},"face":{"name":"面子工夫","layer":"S","high":"在意评价，擅长场面管理","low":"不在乎别人怎么看"},"net":{"name":"网络嵌入","layer":"S","high":"关系网的中枢，乐于动员","low":"孤岛，少求人"}},"proto":{"golden":{"n":"金毛","anx":45,"avo":25,"con":85,"exp":45,"agg":92,"nov":35,"exch":25,"pow":40,"face":45,"net":55},"border":{"n":"边牧","anx":40,"avo":45,"con":95,"exp":30,"agg":35,"nov":85,"exch":65,"pow":70,"face":80,"net":85},"husky":{"n":"哈士奇","anx":20,"avo":60,"con":15,"exp":90,"agg":55,"nov":95,"exch":50,"pow":55,"face":15,"net":25},"poodle":{"n":"泰迪","anx":95,"avo":15,"con":40,"exp":85,"agg":85,"nov":45,"exch":35,"pow":30,"face":90,"net":60},"shiba":{"n":"柴犬","anx":20,"avo":95,"con":60,"exp":15,"agg":25,"nov":35,"exch":70,"pow":80,"face":75,"net":25},"corgi":{"n":"柯基","anx":55,"avo":30,"con":30,"exp":90,"agg":50,"nov":65,"exch":55,"pow":88,"face":85,"net":70},"samoyed":{"n":"萨摩耶","anx":20,"avo":15,"con":45,"exp":80,"agg":97,"nov":65,"exch":30,"pow":35,"face":85,"net":90},"shepherd":{"n":"德牧","anx":30,"avo":50,"con":80,"exp":20,"agg":80,"nov":30,"exch":40,"pow":95,"face":55,"net":45}},"items":[{"id":"Q01","tag":"借钱不还","target":"exch × face × pow","scene":"朋友半年前借了你三千，一直没提。今天你们又约了饭。","opts":[{"t":"饭桌上直接问：那笔钱你什么时候方便？","w":{"pow":3,"face":-2},"why":"把账摆上台面：高权力位置 + 低面子顾虑"},{"t":"不提。这顿之后，下次不再借","w":{"exch":2,"avo":1},"why":"用退出代替交涉：记账 + 回避冲突"},{"t":"找个由头说最近自己也紧","w":{"face":3,"agg":1},"why":"保全双方体面：迂回提示，不撕破脸"}]},{"id":"Q02","tag":"同事抢功","target":"pow × face × agg","scene":"会上，同事把你做的方案说成了他的。","opts":[{"t":"当场补细节，让在场的人自己判断","w":{"pow":3,"exp":1},"why":"公开夺回定义权：高主导 + 高表达"},{"t":"先谢他补充，再补一句\"细节我上周发你了\"","w":{"face":2,"pow":2},"why":"高面子 + 高权力：体面地把定义权拿回来"},{"t":"算了，领导心里有数","w":{"agg":2,"avo":2},"why":"认知重评式退让：把不争解释成体面"}]},{"id":"Q03","tag":"群里被点名","target":"face × exp × anx","scene":"工作群里，领导当众点名说你这次做得不行。","opts":[{"t":"立刻在群里解释清楚","w":{"face":3,"exp":2,"anx":1},"why":"当众修复形象：面子驱动 + 高唤醒"},{"t":"先不回，私下找领导问清楚","w":{"avo":2,"pow":1},"why":"把公开场转成私下场：回避 + 保住位置"},{"t":"先认下来，回头再说","w":{"agg":2,"con":2},"why":"低冲突策略：责任优先，情绪延后"}]},{"id":"Q04","tag":"父母与伴侣","target":"pow × face × avo","scene":"父母和伴侣因为一件小事在你面前吵起来了。","opts":[{"t":"站伴侣，回头跟父母把界限划清","w":{"pow":2,"con":1,"agg":-2},"why":"明确站队：高权力 + 低宜人"},{"t":"两头哄，先让场面过去","w":{"face":3,"agg":2},"why":"场面管理：面子的典型操作"},{"t":"起身走开，等他们自己停","w":{"avo":3},"why":"情绪撤离：回避型应对"}]},{"id":"Q05","tag":"份子钱","target":"exch × face × net","scene":"一个只见过几面的同事结婚，给你发了请帖。","opts":[{"t":"按行情给，不多不少","w":{"exch":3,"con":1},"why":"对等交换：按共同体的行情定价"},{"t":"多给一点，留个好印象","w":{"face":2,"net":3},"why":"人情投资：送礼是网络维护"},{"t":"找个理由不去，也不随","w":{"avo":2,"net":-1,"anx":1},"why":"退出关系场：削减无效义务"}]},{"id":"Q06","tag":"同学会","target":"face × exp × net","scene":"同学会上，混得最好的人一直在讲自己的近况。","opts":[{"t":"跟着捧，场面热络最要紧","w":{"face":2,"net":2,"agg":1,"anx":1},"why":"关系维护：给面子＝给网络续费"},{"t":"找机会也讲讲自己","w":{"exp":2,"pow":2,"face":2},"why":"争夺注意力：自我呈现的竞争面"},{"t":"坐一会儿就走","w":{"avo":2,"exp":-1},"why":"低卷入：不参与地位竞赛"}]},{"id":"Q07","tag":"被当成理所当然","target":"exch × pow × agg","scene":"你一直帮的忙，对方已经当成理所当然了。","opts":[{"t":"说清楚：我可以帮，但这不是应该的","w":{"pow":3,"con":2},"why":"重定契约：把人情拉回对等"},{"t":"下次装忙，能不帮就不帮","w":{"exch":2,"face":2},"why":"被动撤退：不撕破脸地减少投入"},{"t":"继续帮，心里记着","w":{"agg":3,"con":1},"why":"共同体逻辑：关系高于对等"}]},{"id":"Q08","tag":"陌生人求助","target":"agg × anx × con","scene":"地铁上有人突然蹲下，看起来很难受，周围没人动。","opts":[{"t":"先过去扶，同时喊人帮忙","w":{"agg":2,"pow":2},"why":"主动承担：宜人 + 主导的组合"},{"t":"看别人动不动，再决定","w":{"anx":2,"face":1,"pow":-1},"why":"责任分散：怕做错丢面子（旁观者效应）"},{"t":"打 120，把该做的做完","w":{"con":3,"agg":1},"why":"程序化助人：尽责压过情绪"}]},{"id":"Q09","tag":"让你背锅","target":"pow × face × con","scene":"项目出了问题，领导暗示让你在复盘会上把责任认下来。","opts":[{"t":"当场澄清，撕破脸也认","w":{"pow":3,"face":-2},"why":"正面拒绝：宁可失去关系也不失去位置"},{"t":"先认下，事后再找机会说清","w":{"con":2,"agg":2},"why":"延迟处理：用时间换空间"},{"t":"不表态，先把证据留好","w":{"face":2,"avo":1,"pow":1},"why":"留后手：低表达 + 高防御"}]},{"id":"Q10","tag":"亲戚打听工资","target":"face × pow × avo","scene":"过年，一个不太熟的亲戚问你一个月挣多少。","opts":[{"t":"笑着报个数，差不多就行","w":{"face":3,"agg":1},"why":"维持场面：数字是面子的一部分"},{"t":"打太极，反问你呢","w":{"avo":2,"pow":1},"why":"把球踢回去：不失礼地守住边界"},{"t":"直接说不方便聊","w":{"pow":2,"face":-2},"why":"明示边界：不惜牺牲和气"}]},{"id":"Q11","tag":"朋友逼你站队","target":"net × pow × face","scene":"两个朋友闹翻了，都来找你，让你表态站哪边。","opts":[{"t":"两边都不站，把原因说清","w":{"con":2,"pow":2,"net":1},"why":"守住中间位置：桥接者的典型策略"},{"t":"站看起来更有理的那边","w":{"pow":2,"exp":1,"agg":-1},"why":"押注：用立场换位置"},{"t":"拖着，谁问都说还没想好","w":{"face":2,"avo":2,"anx":1},"why":"拖延：不表态本身是一种表态"}]},{"id":"Q12","tag":"分组可见","target":"face × exp × nov","scene":"你要发一条情绪很重的朋友圈。","opts":[{"t":"全都一样，没什么不能看的","w":{"face":-2,"exp":2,"nov":1},"why":"低自我监控：不在乎观众差异"},{"t":"分好组，谁该看什么已经想好","w":{"face":3,"con":2},"why":"观众隔离：Goffman 的前台/后台管理"},{"t":"最后没发，存成仅自己可见","w":{"avo":2,"exp":-1},"why":"退回后台：避免被评价"}]},{"id":"Q13","tag":"被介绍对象","target":"face × pow × avo","scene":"长辈没跟你商量，就把你的微信给了别人。","opts":[{"t":"去见一面，给长辈面子","w":{"face":3,"agg":2,"net":1},"why":"顺差序格局：长辈的好意要不要领"},{"t":"直接说不去，我的事我自己定","w":{"pow":2,"exp":1},"why":"个体化取向：拒绝被代理"},{"t":"去了，但全程不投入","w":{"avo":2,"anx":1},"why":"消极配合：形式上答应，实质上退出"}]},{"id":"Q14","tag":"合租摩擦","target":"con × face × agg","scene":"室友连续两周不打扫公共区域。","opts":[{"t":"贴个值日表，按表来","w":{"con":3,"pow":1},"why":"制度化：把人际问题转成规则问题"},{"t":"自己顺手做了，懒得开口","w":{"agg":2,"avo":1},"why":"以劳动回避冲突"},{"t":"委婉提一句，怕伤和气","w":{"face":3,"anx":1},"why":"和气优先：高面子成本"}]},{"id":"Q15","tag":"网络骂战","target":"exp × avo × pow","scene":"你在评论区被人指名骂了。","opts":[{"t":"逐条回，把话怼回去","w":{"exp":3,"pow":2,"face":1},"why":"公开对决：把场面争回来，同时也在经营形象"},{"t":"举报、拉黑，然后去做别的","w":{"avo":2,"con":1},"why":"切断接触：把成本降到最低"},{"t":"删评论，当没看见","w":{"avo":2,"face":1},"why":"清场：恢复可控的观众环境"}]},{"id":"Q16","tag":"团建","target":"net × pow × nov","scene":"部门团建，安排在周末，说是\"自愿参加\"。","opts":[{"t":"去，还能认识几个人","w":{"net":3,"nov":1},"why":"网络投资：把义务劳动转成人脉"},{"t":"去，但坐角落","w":{"avo":2,"face":1},"why":"最低成本合规：人在场，人不投入"},{"t":"找个理由不去","w":{"pow":2,"net":-2},"why":"拒绝义务社交：拿位置换自由"}]},{"id":"Q17","tag":"亲戚借钱","target":"exch × agg × face","scene":"亲戚开口借一笔不小的钱，没说什么时候还。","opts":[{"t":"借，亲戚一场","w":{"agg":3,"exch":-2,"face":1,"net":1},"why":"人情优先：关系本身就是抵押"},{"t":"借一部分，说清还款时间","w":{"con":2,"exch":2},"why":"把人情转成契约：对等 + 可执行"},{"t":"不借，但话说得软","w":{"face":2,"agg":1,"exch":1},"why":"保住关系、保住钱：面子做缓冲"}]},{"id":"Q18","tag":"搬家","target":"net × nov × exch","scene":"你要搬家，朋友说可以来帮忙。","opts":[{"t":"叫，人多热闹，搬完请一顿","w":{"net":3,"nov":1},"why":"网络动员：把帮忙变成一次关系事件"},{"t":"只叫一两个真熟的","w":{"con":1,"net":1},"why":"低强度动员：只动用强关系"},{"t":"请师傅，不麻烦人","w":{"exch":2,"avo":1},"why":"把关系从劳动中摘出去：更清爽也更孤立"}]},{"id":"Q19","tag":"被拿来比较","target":"face × pow × anx","scene":"\"你表姐都买房了，你呢？\"","opts":[{"t":"笑着应下，心里不服","w":{"face":2,"anx":1,"pow":1},"why":"场面维持 + 内部激活：笑着的人最累"},{"t":"当场反驳，讲自己的道理","w":{"exp":2,"pow":2,"face":2},"why":"公开反击：把比较拉回谈判"},{"t":"不接话，换个话题","w":{"avo":2,"agg":1},"why":"话题管理：不进入对方的评价框架"}]},{"id":"Q20","tag":"拒绝难","target":"pow × face × anx","scene":"有人请你帮一个明显不合理的忙。","opts":[{"t":"直接说不，不解释","w":{"pow":3,"face":-2},"why":"边界即答案：不提供理由就不提供入口"},{"t":"委婉绕一大圈，希望对方自己懂","w":{"face":3,"agg":2},"why":"面子优先：拒绝也要给对方台阶"},{"t":"先答应，再想办法推","w":{"anx":2,"agg":2,"con":-1},"why":"回避即时冲突：把成本推给未来的自己"}]},{"id":"Q21","tag":"秘密","target":"con × exp × anx","scene":"朋友把一个秘密告诉了你，还叮嘱别说。","opts":[{"t":"烂在肚子里，谁也不提","w":{"con":3,"agg":1},"why":"守约：把承诺当硬约束"},{"t":"没忍住，跟最亲的人说了","w":{"exp":2,"con":-2},"why":"倾诉冲动：亲密关系优先于保密义务"},{"t":"先问清楚：这事还有谁知道","w":{"anx":2,"pow":1,"con":1},"why":"先摸清信息边界：控制风险"}]},{"id":"Q22","tag":"半熟的人","target":"exp × avo × nov","scene":"电梯里遇到一个半熟的人，还有 30 层。","opts":[{"t":"主动开口，随便聊两句","w":{"exp":2,"agg":2,"nov":1},"why":"主动社交：把尴尬转成机会"},{"t":"点头微笑，然后看手机","w":{"face":2,"avo":1},"why":"礼貌性不打扰（civil inattention）"},{"t":"装作没看见","w":{"avo":3,"face":-1},"why":"直接回避：连礼貌成本都不付"}]},{"id":"Q23","tag":"被插队","target":"pow × agg × anx","scene":"排队时有人直接插到你前面。","opts":[{"t":"当场说：请到后面排队","w":{"pow":3,"exp":1,"agg":-1,"face":1},"why":"公开执行规范：权力行使本身也是形象管理"},{"t":"算了，不值得为这个吵","w":{"agg":2,"avo":1},"why":"成本核算后的退让"},{"t":"看别人什么反应，再决定","w":{"face":2,"anx":1,"pow":-1},"why":"社会参照：让群体先定义情况"}]},{"id":"Q24","tag":"加班文化","target":"pow × con × net","scene":"到了下班时间，办公室没人走。你手上的事已经做完了。","opts":[{"t":"收拾东西走人，活干完就行","w":{"pow":2,"con":2,"face":-1},"why":"结果导向：用绩效合法性对抗规范压力"},{"t":"跟着熬，别显得不合群","w":{"net":2,"face":2,"con":1,"anx":1},"why":"规范性同构：先保住团体位置"},{"t":"熬着，但心里骂","w":{"agg":1,"exp":-1,"face":1},"why":"服从 + 压抑：表面一致，内部记账"}]},{"id":"Q25","tag":"送礼回礼","target":"exch × face × nov","scene":"同事送了你不算便宜的礼物。","opts":[{"t":"记下人情账，找个机会等价回","w":{"exch":3,"con":2},"why":"人情账本：欠与还的精确管理"},{"t":"只送心意，不记账","w":{"agg":2,"exch":-2},"why":"共同体逻辑：礼物不是交易"},{"t":"回得更特别一点，让对方记住","w":{"face":2,"nov":2},"why":"以差异立位：用超预期换记忆点"}]},{"id":"Q26","tag":"换城市","target":"nov × con × anx","scene":"有个去外地的好机会，但要重新开始，现有关系网用不上。","opts":[{"t":"去，人在哪都能活","w":{"nov":3,"pow":2,"net":-1},"why":"高开放 + 高能动：把自己当资源"},{"t":"算清楚再说，怕失去现在的关系","w":{"con":2,"anx":2,"net":1},"why":"沉没成本与人际依赖的双重计算"},{"t":"不去，稳定最重要","w":{"con":1,"nov":-2,"avo":1},"why":"风险规避：可预期优于可能性"}]},{"id":"Q27","tag":"父母养老","target":"agg × exch × pow","scene":"父母年纪大了，你在外地，他们嘴上说不用管。","opts":[{"t":"想办法回去，照顾是本分","w":{"agg":2,"con":2,"exch":-2},"why":"差序格局的义务：亲情不是可选项"},{"t":"出钱请人照顾，自己留在外地","w":{"exch":2,"con":1},"why":"把照护货币化：用资源替代在场"},{"t":"先过好自己的生活，再谈照顾","w":{"pow":2,"agg":-2,"nov":1},"why":"个体化取向：自我实现优先"}]},{"id":"Q28","tag":"新东西","target":"nov × con × anx","scene":"公司要换一套没人用过的系统，大家都说等别人先试。","opts":[{"t":"我先来，坏了再修","w":{"nov":3,"pow":1},"why":"把不确定当奖励：探索型应对"},{"t":"等别人试完踩完坑再说","w":{"con":2,"anx":1},"why":"风险控制：用信息换时间"},{"t":"按老办法来，能跑就行","w":{"con":1,"nov":-3},"why":"路径依赖：可预期压倒可能性"}]},{"id":"Q29","tag":"被造谣","target":"pow × face × avo","scene":"有人在群里说了你一句不实的话。","opts":[{"t":"当面对质，把话讲清楚","w":{"pow":2,"exp":2,"face":-1},"why":"正面对决：宁可冲突也不留悬案"},{"t":"发一条澄清，只讲事实","w":{"face":2,"con":2,"exp":1},"why":"形象修复：用证据管理观众"},{"t":"不解释，清者自清","w":{"avo":2,"face":1,"pow":-1},"why":"撤回投入：不值得为这个观众花力气"}]},{"id":"Q30","tag":"深夜来电","target":"agg × con × avo","scene":"凌晨两点，朋友失恋打来电话。","opts":[{"t":"接，陪着聊到 ta 睡着","w":{"agg":3,"anx":1},"why":"情感劳动：把对方的需要放在自己之前"},{"t":"接，但说明天再细说","w":{"con":2,"pow":1},"why":"有边界的照顾：在场但设定范围"},{"t":"静音，第二天再回","w":{"avo":2,"con":1,"agg":-1},"why":"保护自己的休息：回避 + 现实优先"}]},{"id":"Q31","tag":"已读不回","target":"anx（纯）","scene":"你给一个挺重要的人发了消息，对方一整天没回，但朋友圈刚更新过。","opts":[{"t":"反复点开对话框，想再发一句\"在吗\"","w":{"anx":3,"exp":1},"why":"过度激活：用追加消息换一个回应"},{"t":"先把事情忙完，晚上再说","w":{"anx":-2,"con":1},"why":"安全型基线：把节奏拿回自己手里"},{"t":"看到 ta 在更新，反复想是不是自己说错了话","w":{"anx":3,"avo":1},"why":"反刍而非求证：焦虑很高、但不发作（低表达焦虑，正是 v2 之前测不到的角落）"}]},{"id":"Q32","tag":"被移出小群","target":"anx（纯）","scene":"你发现自己被一个朋友移出了小群，没人解释。","opts":[{"t":"马上私聊问清楚，是不是我哪里做得不对","w":{"anx":3,"exp":1},"why":"寻求再保证：先用自证换取解释"},{"t":"装作没发现，等别人提起","w":{"avo":2,"face":2},"why":"压住不问：把猜测留在自己这边"},{"t":"不管，正好少一个群","w":{"anx":-3,"avo":1},"why":"低焦虑基线：拒绝把别人的动作读成对自己的评价"}]},{"id":"Q33","tag":"态度变冷","target":"anx × avo","scene":"对方回消息越来越短。你问过一次，ta 说\"没有啊\"。","opts":[{"t":"隔几天再问一次，确认不是自己想多","w":{"anx":3,"con":1},"why":"反复求证：焦虑驱动的二次确认"},{"t":"相信 ta，把注意力收回来","w":{"anx":-2,"con":1},"why":"安全型基线：接受一个不完美的解释"},{"t":"干脆也冷下来，看谁先开口","w":{"avo":3,"pow":1},"why":"去激活：用撤退夺回一点控制感"}]},{"id":"Q34","tag":"被夸之后","target":"anx × con","scene":"你在会上汇报完，领导说\"这次不错\"。","opts":[{"t":"追问一句：具体哪里还行？","w":{"anx":3,"con":1},"why":"再保证寻求：好消息也要一个可核对的凭据"},{"t":"接受，转头就过去了","w":{"anx":-2},"why":"低焦虑基线：不需要把夸奖拆开验证"},{"t":"自己复盘一遍，找问题","w":{"con":3,"anx":1},"why":"尽责驱动的复盘：干得多但未必是焦虑"}]},{"id":"Q35","tag":"读到一半","target":"nov × con","scene":"一本书读到 120 页，越读越觉得对你没什么用。","opts":[{"t":"合上，换一本——时间比这本书贵","w":{"nov":3,"con":1},"why":"及时止损：把注意力当沉没资源管理"},{"t":"硬着头皮读完，不然白买了","w":{"con":3,"nov":-2},"why":"沉没成本谬误的教科书表达：用\"完成\"安慰自己"},{"t":"跳着翻完目录，看看有没有能用的","w":{"con":2,"nov":2},"why":"高尽责 + 高探索的中间解：既不浪费也不硬扛"}]},{"id":"Q36","tag":"合伙邀约","target":"nov × pow","scene":"老同学拉你合伙做一件事，模式还没被验证过。","opts":[{"t":"先干起来，边做边验证","w":{"nov":3,"pow":2},"why":"把不确定当入场券：高探索 + 高能动"},{"t":"让他先跑半年数据，再谈","w":{"con":2,"nov":-1},"why":"用信息换风险：审慎不等于守旧"},{"t":"不参与，这种事风险太大","w":{"nov":-3,"avo":1},"why":"风险规避：可预期优于可能性"}]},{"id":"Q37","tag":"常去的店没了","target":"nov × avo","scene":"你常去的那家小店关门了。","opts":[{"t":"在附近找家没吃过的试试","w":{"nov":3},"why":"把缺口当探索机会"},{"t":"找同一家连锁，味道有保障","w":{"nov":-2,"con":2},"why":"用标准化替代不确定性"},{"t":"算了，回家自己煮","w":{"avo":2,"nov":-1},"why":"退出选择：不折腾就不会踩雷"}]},{"id":"Q38","tag":"被安利","target":"nov × con","scene":"朋友极力推荐一个你完全没接触过的东西，说\"你一定要试\"。","opts":[{"t":"直接下单，踩坑也算一次体验","w":{"nov":3},"why":"把试错当成本，而不是损失"},{"t":"先看半个月评价再决定","w":{"con":2,"nov":-1},"why":"信息搜集：用时间对冲不确定性"},{"t":"不感兴趣，我现在这样挺好","w":{"nov":-2,"avo":1},"why":"现状偏好：已知的舒适优于未知的可能"}]},{"id":"Q39","tag":"绕不过去","target":"pow × face × agg","scene":"你要推的一件事被中间人一直压着，流程走不通，但真正能拍板的人在上一级。","opts":[{"t":"直接找能拍板的人，把事讲清楚，不评价中间人","w":{"pow":3,"face":1},"why":"越级但不撕破脸：权力可以体面地行使"},{"t":"继续磨中间人，把关系做顺再推","w":{"agg":2,"face":2,"pow":-1},"why":"用关系换通路：把位置让一部分出去"},{"t":"先放一放，等时机到了再说","w":{"avo":2,"anx":1},"why":"退出博弈：不争也不动"}]},{"id":"Q40","tag":"下属闯祸","target":"pow × agg","scene":"你带的实习生把客户方案弄错了，客户在群里点名发火。","opts":[{"t":"先在群里把责任揽下来，回头再带他改","w":{"pow":2,"agg":2},"why":"保护性主导：护住自己人，权力用来兜底"},{"t":"当场说清楚是谁做的，让他自己面对","w":{"pow":2,"agg":-3,"face":1},"why":"切割式主导：当众定责，也是当众立规矩"},{"t":"私下安抚客户，把事情按下去","w":{"face":2,"avo":1},"why":"场面优先：不公开、不定责、慢慢消"}]},{"id":"Q41","tag":"谁来拍板","target":"pow × con × agg","scene":"一件大家都关心的事拖了半个月，谁都不愿意拍板。","opts":[{"t":"我拍板，出问题我负责","w":{"pow":3,"con":2},"why":"承担型权力：用责任换取决定权"},{"t":"继续讨论，等到所有人都能接受","w":{"agg":1,"face":2,"con":-1},"why":"共识优先：宁可慢，也不要有人被落下"},{"t":"拖到必须决定的那天再说","w":{"avo":2,"anx":1},"why":"把决定权交给时间"}]},{"id":"Q42","tag":"替班","target":"exch × pow","scene":"同事第三次找你替他值周末班，前两次他都没还。","opts":[{"t":"这回可以，但把话说明白：下次得换你","w":{"exch":3,"pow":1},"why":"把人情的欠条显性化：交换取向的核心动作"},{"t":"行，都是同事","w":{"exch":-2,"agg":1},"why":"不算账：可能是慷慨，也可能是不敢拒绝"},{"t":"这次不行，前两次还没还","w":{"pow":2,"exch":1},"why":"直接结账：用拒绝把账本摆平"}]},{"id":"Q43","tag":"介绍资源","target":"exch","scene":"你把一个客户介绍给朋友，事情成了，他一句都没提。","opts":[{"t":"下次不介绍了，各走各的","w":{"exch":3,"avo":1},"why":"收回投资：不吵，但也不再加仓"},{"t":"直接说：这单我出了力","w":{"exch":2,"pow":2,"face":-1},"why":"当面要回报：把潜规则翻译成明规则"},{"t":"无所谓，帮上忙就好","w":{"exch":-3},"why":"纯共同体：不计账、不要求对等（不含情感温度）"}]},{"id":"Q44","tag":"合买","target":"exch × con","scene":"你和朋友合买了一件大件，说好共用。","opts":[{"t":"先把怎么分、怎么摊写清楚","w":{"exch":3,"con":2},"why":"先把规则定下来：契约优先于关系"},{"t":"一起用就行，计较这些没意思","w":{"exch":-2,"agg":1},"why":"共同体逻辑：关系本身就能承担不确定性"},{"t":"各买各的，省得将来扯皮","w":{"exch":1,"avo":1},"why":"用隔离替代协商"}]},{"id":"Q45","tag":"找人办事","target":"net × con","scene":"你要办一件不熟的事（比如找个靠谱的装修队），没什么现成渠道。","opts":[{"t":"在朋友圈问一圈，让熟人推荐","w":{"net":3,"exp":1},"why":"网络动员：把弱连接变成信息通道"},{"t":"只问一两个最信得过的人","w":{"net":1,"con":1},"why":"低强度动员：只用强关系，不惊动整个网"},{"t":"自己搜、自己比，不麻烦人","w":{"net":-2,"con":1},"why":"去网络化：用检索替代人际"}]},{"id":"Q46","tag":"两个圈子","target":"net × agg","scene":"你有两个完全不重叠的朋友圈，刚好都在同一个城市。","opts":[{"t":"找机会让他们认识，合成一张网","w":{"net":3,"agg":1,"exp":1},"why":"桥接行为：结构洞的填补者"},{"t":"分开就好，各玩各的","w":{"net":-2},"why":"保持隔离：不制造新的连带"},{"t":"看场合，凑得上就一起","w":{"net":1,"con":1},"why":"情境性整合：不主动也不排斥"}]},{"id":"Q47","tag":"求人","target":"net × face × pow","scene":"有件事只有一位关系一般的前同事能帮上忙。","opts":[{"t":"直接开口，欠人情就欠人情","w":{"net":2,"pow":1,"face":1},"why":"承认依赖并动用关系：网络嵌入的行为表达"},{"t":"先旁敲侧击，看他愿不愿意","w":{"face":2,"net":1},"why":"留退路：不把被拒绝摊在明面上"},{"t":"算了，自己想办法","w":{"net":-3,"avo":1},"why":"宁可不办也不欠人：孤岛策略"}]}],"texts":{"golden":{"line":"不太会走，也不太会问","tags":["稳定","供给","共同体"],"body":"你把关系当长期项目做：修水管、记日子、在对方崩溃之前把饭做好。你不是没有情绪，是不习惯把情绪当筹码。别人说你稳，其实你只是把话说在了做事里。","risk":"你的付出太安静，安静到容易被当成理所当然。"},"border":{"line":"把关系当成一个可以优化的系统","tags":["规划","边界","高社交位"],"body":"你能提前三步看到问题在哪，也愿意动手改。承诺对你不是情绪，是排期。你不怕冲突，但受不了低效——所以你常常不是最受欢迎的那个，而是最后被依赖的那个。","risk":"你容易把人也当成可优化的对象，包括你自己。"},"husky":{"line":"不擅长维持，但擅长重启","tags":["新鲜","外放","反规则"],"body":"你对新鲜感的胃口比大多数人大，规则在你这里经常只是建议。你能把沉闷的场面搅活，也能把稳的局面搅乱。你不太记仇，因为你连昨天的事都记不太清。","risk":"你把\"我不需要谁\"当成自由，其实是把门关上了。"},"poodle":{"line":"要的不是陪，是回应","tags":["高焦虑","黏","高面子"],"body":"你对关系的信号极其敏感，一条没回的消息能推演出一整部剧。你给的很多，要的其实很少：一个明确的\"我在\"。","risk":"把确认当成爱，会把你困在不停求证里。"},"shiba":{"line":"不解释，也不追问","tags":["边界","低表达","自足"],"body":"你的边界清楚得几乎不用宣告。别人要靠很久才摸到你的软处，而你自己知道它在哪。你不怕一个人，你怕的是被打扰。","risk":"把\"我不说\"当成\"你该懂\"，是关系里最贵的误会。"},"corgi":{"line":"嗓门比想法先到","tags":["高表达","高位置","要场面"],"body":"你存在感强，反应快，敢在场面里站出来。你不怕得罪人，但常常事后才发现自己用力过猛。你的热心和好胜常常是同一件事。","risk":"用音量代替论证，赢的是场面，输的是人。"},"samoyed":{"line":"一进门，房间的温度就变了","tags":["社交中枢","高亲和","低回避"],"body":"你天然会照顾场面的情绪，能让陌生人三句话就放松。你的热是真的，但你的热也带着一点\"不能冷场\"的义务感。","risk":"把\"大家都喜欢我\"当成\"我被理解\"，是最孤独的一种热闹。"},"shepherd":{"line":"不说\"我在\"，你做","tags":["扛事","护人","低表达"],"body":"你的承诺以行动计价：扛下来、兜住、不让事情掉在地上。你不太需要别人夸你，你需要别人别给你添乱。","risk":"把所有事扛到自己身上，最后没人记得你也会累。"}},"roles":{"op":{"name":"操盘手","text":"你在关系里算得清，也扛得住。你能把模糊的事谈成条款，也能在必要时让步——但让步是你选的，不是被逼的。"},"guardian":{"name":"守护者","text":"你说了算，但你的\"说了算\"是把事扛下来。你护人，不解释；你付出，不邀功。"},"calc":{"name":"精算者","text":"你记得每一笔，因为你输不起。你不是小气，是位置让你必须算。"},"supply":{"name":"供给者","text":"你给，是因为你在乎。你不记账，但也常常忘了自己也需要被给。"}},"colors":{"golden":"#C08A3E","border":"#5F7268","husky":"#6E7C8C","poodle":"#BF7A63","shiba":"#A4705A","corgi":"#C2854F","samoyed":"#C3B39C","shepherd":"#4B5451"},"rules":{"pairs":[{"a":"avo","b":"exp","r":-0.618},{"a":"agg","b":"pow","r":-0.612},{"a":"exp","b":"pow","r":0.543},{"a":"pow","b":"face","r":-0.541}],"flags":{"anx":{"alpha30":0.626,"rTrue":0.79,"mode":"silent"},"avo":{"alpha30":0.758,"rTrue":0.71,"mode":"reference"},"exp":{"alpha30":0.664,"rTrue":0.66,"mode":"silent"},"pow":{"alpha30":0.853,"rTrue":0.7,"mode":"reference"},"net":{"alpha30":0.663,"rTrue":0.81,"mode":"silent"}},"alpha15":{"anx":0.757,"avo":0.878,"con":0.835,"exp":0.725,"agg":0.825,"nov":0.82,"exch":0.817,"pow":0.903,"face":0.89,"net":0.824},"alpha30":{"anx":0.626,"avo":0.758,"con":0.717,"exp":0.664,"agg":0.798,"nov":0.723,"exch":0.735,"pow":0.853,"face":0.855,"net":0.663},"rTrue30":{"anx":0.79,"avo":0.71,"con":0.76,"exp":0.66,"agg":0.8,"nov":0.81,"exch":0.76,"pow":0.7,"face":0.83,"net":0.81},"thresholds":{"pairMinAbsR":0.5,"pairMinDev":12,"stableAlpha30":0.7,"referenceRTrue":0.75,"referenceMinDev":0,"roleDeadzone":5}},"version":"f4195e91","img":{"golden":{"hero":"assets/dog-golden-720.webp?v=06e657c7","thumb":"assets/dog-golden-320.webp?v=06e657c7"},"border":{"hero":"assets/dog-border-720.webp?v=06e657c7","thumb":"assets/dog-border-320.webp?v=06e657c7"},"husky":{"hero":"assets/dog-husky-720.webp?v=06e657c7","thumb":"assets/dog-husky-320.webp?v=06e657c7"},"poodle":{"hero":"assets/dog-poodle-720.webp?v=06e657c7","thumb":"assets/dog-poodle-320.webp?v=06e657c7"},"shiba":{"hero":"assets/dog-shiba-720.webp?v=06e657c7","thumb":"assets/dog-shiba-320.webp?v=06e657c7"},"corgi":{"hero":"assets/dog-corgi-720.webp?v=06e657c7","thumb":"assets/dog-corgi-320.webp?v=06e657c7"},"samoyed":{"hero":"assets/dog-samoyed-720.webp?v=06e657c7","thumb":"assets/dog-samoyed-320.webp?v=06e657c7"},"shepherd":{"hero":"assets/dog-shepherd-720.webp?v=06e657c7","thumb":"assets/dog-shepherd-320.webp?v=06e657c7"}}};
+const KEYS = Object.keys(DATA.dims);
+const ITEMS = DATA.items, PROTO = DATA.proto, DIMS = DATA.dims, TEXTS = DATA.texts, ROLES = DATA.roles, COLORS = DATA.colors, RULES = DATA.rules, IMG = DATA.img;
+const app = document.getElementById('app');
+let answers = [], idx = 0, order = [], cur = null, log = null;
+
+/* ---------- 计分（与 src/scoring.mjs 同构） ---------- */
+const CALIB = (function(){
+  const out = {};
+  for (const k of KEYS) {
+    let mean = 0, scale = 0;
+    for (const it of ITEMS) {
+      const ws = it.opts.map(function(o){ return o.w[k] || 0; });
+      const m = ws.reduce(function(a,b){ return a+b; }, 0) / ws.length;
+      mean += m;
+      scale += Math.max.apply(null, ws.map(function(w){ return Math.abs(w-m); }));
+    }
+    out[k] = { mean: mean, scale: scale || 1 };
+  }
+  return out;
+})();
+function zs(v){ const m = v.reduce(function(a,b){return a+b;},0)/v.length; const s = Math.sqrt(v.reduce(function(a,b){return a+(b-m)*(b-m);},0)/v.length) || 1; return v.map(function(x){return (x-m)/s;}); }
+function pearson(a,b){ const za = zs(a), zb = zs(b); let s = 0; for (let i=0;i<a.length;i++) s += za[i]*zb[i]; return s/a.length; }
+function normOf(raw){ const o = {}; KEYS.forEach(function(k){ const d = raw[k]-CALIB[k].mean; o[k] = 50 + 50*Math.max(-1, Math.min(1, d/CALIB[k].scale)); }); return o; }
+function halfVec(parity){
+  const items = ITEMS.map(function(_,i){ return i; }).filter(function(i){ return i%2===parity; });
+  const raw = {}; KEYS.forEach(function(k){ raw[k]=0; });
+  items.forEach(function(qi){ const o = ITEMS[qi].opts[answers[qi]]; for (const k in o.w) raw[k] += o.w[k]; });
+  return KEYS.map(function(k){
+    let mean=0, scale=0;
+    for (const qi of items) {
+      const ws = ITEMS[qi].opts.map(function(o){ return o.w[k]||0; });
+      const m = ws.reduce(function(a,b){return a+b;},0)/ws.length;
+      mean += m;
+      scale += Math.max.apply(null, ws.map(function(w){ return Math.abs(w-m); }));
+    }
+    return scale>0 ? Math.max(-1, Math.min(1, (raw[k]-mean)/scale)) : 0;
+  });
+}
+function compute(){
+  const raw = {}; KEYS.forEach(function(k){ raw[k]=0; });
+  ITEMS.forEach(function(it,qi){ const o = it.opts[answers[qi]]; for (const k in o.w) raw[k] += o.w[k]; });
+  const norm = normOf(raw);
+  const vec = KEYS.map(function(k){ return norm[k]; });
+  const ranked = Object.keys(PROTO).map(function(id){
+    return { id:id, name:PROTO[id].n, r:pearson(vec, KEYS.map(function(k){ return PROTO[id][k]; })) };
+  }).sort(function(a,b){ return b.r-a.r; });
+  const rh = pearson(halfVec(0), halfVec(1));
+  const sb = (2*rh)/(1+Math.abs(rh));
+  const margin = ranked[0].r - ranked[1].r;
+  const conf = Math.round(100*(0.45*Math.max(0,Math.min(1,sb)) + 0.40*Math.min(1,margin/0.25) + 0.15*1));
+  return { raw:raw, norm:norm, vec:vec, ranked:ranked, consistency:sb, margin:margin, conf:conf };
+}
+function roleOf(n){
+  const p = n.pow, e = n.exch, D = RULES.thresholds.roleDeadzone;
+  if (Math.abs(p-50)<=D || Math.abs(e-50)<=D) return null;
+  if (p>=50 && e>=50) return 'op';
+  if (p>=50 && e<50) return 'guardian';
+  if (p<50 && e>=50) return 'calc';
+  return 'supply';
+}
+function roleWhy(n){
+  const D = RULES.thresholds.roleDeadzone;
+  const p = Math.abs(n.pow-50)<=D, e = Math.abs(n.exch-50)<=D;
+  if (p && e) return '权力感与交换取向都靠近中线';
+  if (p) return '权力位置落在中线附近（你既不像能定规矩的人，也不像被安排的人）';
+  return '交换取向落在中线附近（你既不像记账的人，也不像不算账的人）';
+}
+function contrib(s, protoId){
+  const target = KEYS.map(function(k){ return PROTO[protoId][k]; });
+  const baseR = pearson(s.vec, target);
+  const out = [];
+  ITEMS.forEach(function(it,qi){
+    const chosen = it.opts[answers[qi]];
+    const avg = KEYS.map(function(k){ let t=0; it.opts.forEach(function(o){ t += (o.w[k]||0); }); return t/3; });
+    const alt = s.vec.map(function(v,i){ return v - (chosen.w[KEYS[i]]||0) + avg[i]; });
+    out.push({ qi:qi, delta: baseR - pearson(alt, target) });
+  });
+  out.sort(function(a,b){ return Math.abs(b.delta)-Math.abs(a.delta); });
+  return out.slice(0,3);
+}
+
+/* ---------- 交互 ---------- */
+function show(id){ Array.prototype.forEach.call(document.querySelectorAll('.screen'), function(s){ s.classList.remove('on'); }); document.getElementById(id).classList.add('on'); window.scrollTo(0,0); }
+function shuffle(a){ const b=a.slice(); for (let i=b.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=b[i]; b[i]=b[j]; b[j]=t; } return b; }
+
+function cover(){
+  app.innerHTML = '<section class="screen on" id="cover">'
+    + '<h1 class="serif">汪格 <span style="font-size:15px;letter-spacing:.2em;color:var(--ink3)">WOOF-TI</span></h1>'
+    + '<p class="sub">四十七个情景，一个答案。<br>测完，你就知道你是什么狗。</p>'
+    + '<p class="meta">约 3 分钟 · 答案不出端</p>'
+    + '<div class="actions"><button class="btn" id="startBtn">开始</button></div>'
+    + '<div class="foot">仅供娱乐与自我觉察，不构成心理诊断。</div>'
+    + '</section>';
+  document.getElementById('startBtn').onclick = startTest;
+}
+
+function startTest(){
+  answers = new Array(ITEMS.length).fill(null);
+  order = ITEMS.map(function(){ return shuffle([0,1,2]); });
+  idx = 0;
+  log = { v: DATA.version, sid: Date.now().toString(36), t0: Date.now(), last: Date.now(), items: [] };
+  renderQ();
+}
+function renderQ(){
+  const it = ITEMS[idx], ord = order[idx];
+  app.innerHTML = '<section class="screen on" id="quiz">'
+    + '<div class="bar"><i style="width:' + Math.round((idx)/ITEMS.length*100) + '%"></i></div>'
+    + '<div class="qmeta"><span>' + (idx+1) + ' / ' + ITEMS.length + '</span><span>' + it.tag + '</span></div>'
+    + '<div class="scene">' + it.scene + '</div>'
+    + '<div class="opts">' + ord.map(function(oi, i){
+        return '<button class="opt" data-oi="' + oi + '">' + it.opts[oi].t + '</button>';
+      }).join('') + '</div>'
+    + '<div class="nav"><span class="link" id="back">' + (idx>0?'← 上一题':'') + '</span><span style="color:var(--ink3)">' + Math.round((ITEMS.length-idx)*3.5/60) + ' 分钟</span></div>'
+    + '</section>';
+  Array.prototype.forEach.call(document.querySelectorAll('.opt'), function(b){
+    if (answers[idx] !== null && parseInt(b.getAttribute('data-oi'),10) === answers[idx]) b.classList.add('pick');
+    b.onclick = function(){ pick(parseInt(b.getAttribute('data-oi'),10)); };
+  });
+  const back = document.getElementById('back');
+  if (back) back.onclick = function(){ if (idx>0){ idx--; renderQ(); } };
+}
+function pick(oi){
+  answers[idx] = oi;
+  if (log) {
+    const now = Date.now();
+    log.items.push({ qid: ITEMS[idx].id, tag: ITEMS[idx].tag, opt: oi, pos: order[idx].indexOf(oi), order: order[idx].slice(), ms: now - log.last, ts: now });
+    log.last = now;
+  }
+  if (idx < ITEMS.length-1) { idx++; setTimeout(renderQ, 90); }
+  else setTimeout(result, 120);
+}
+
+function result(){
+  const s = compute();
+  const top = s.ranked[0], second = s.ranked[1];
+  const t = TEXTS[top.id];
+  const tie = s.margin < 0.03;
+  const role = roleOf(s.norm);
+  const ks = contrib(s, top.id);
+  const pct = Math.round(Math.max(0, top.r) * 100);
+  const pct2 = Math.round(Math.max(0, second.r) * 100);
+  const lowConf = s.conf < 45;
+  try {
+    persist({ v: DATA.version, sid: (log && log.sid) || 'demo', at: new Date().toISOString(), t0: (log && log.t0) || Date.now(), dog: top.id, dogName: top.name, role: role, conf: s.conf, items: (log && log.items) || [] });
+  } catch (e) {}
+
+  const dimRows = KEYS.map(function(k){
+    const v = s.norm[k], d = v-50, w = Math.abs(d);
+    const left = d>=0 ? '50%' : (50-w/2) + '%';
+    const f = RULES.flags[k];
+    const base = v>=65 ? '偏强' : v<=35 ? '偏弱' : '居中';
+    const tag = f && f.mode === 'silent' ? '—' : (f && f.mode === 'reference' ? base + '·参考' : base);
+    return '<div class="dim"><span class="dn">' + DIMS[k].name + '</span>'
+      + '<span class="track"><i style="left:' + left + ';width:' + (w/2) + '%"></i></span>'
+      + '<span class="dv">' + tag + '</span></div>';
+  }).join('');
+
+  // 规则一：高相关配对从审计结果生成，不单独叙事
+  const PAIRS = RULES.pairs.map(function(p){ return [p.a, p.b, p.r]; });
+  const MINDEV = RULES.thresholds.pairMinDev;
+  const notes = PAIRS.filter(function(p){
+    return Math.abs(s.norm[p[0]]-50) >= MINDEV && Math.abs(s.norm[p[1]]-50) >= MINDEV;
+  }).slice(0,2);
+  const silentDims = KEYS.filter(function(k){ return RULES.flags[k] && RULES.flags[k].mode === 'silent'; });
+  const refDims = KEYS.filter(function(k){ return RULES.flags[k] && RULES.flags[k].mode === 'reference'; });
+  const weakNote = (silentDims.length
+      ? '「' + silentDims.map(function(k){ return DIMS[k].name; }).join('」「') + '」内部一致性不足（仿真上界 α '
+        + Math.min.apply(null, silentDims.map(function(k){ return RULES.flags[k].alpha30; })).toFixed(2) + '–'
+        + Math.max.apply(null, silentDims.map(function(k){ return RULES.flags[k].alpha30; })).toFixed(2) + '），只画条、不给方向；'
+      : '')
+    + (refDims.length
+      ? '「' + refDims.map(function(k){ return DIMS[k].name; }).join('」「') + '」的估计追真值偏弱（r≈'
+        + Math.min.apply(null, refDims.map(function(k){ return RULES.flags[k].rTrue; })).toFixed(2) + '–'
+        + Math.max.apply(null, refDims.map(function(k){ return RULES.flags[k].rTrue; })).toFixed(2) + '），标了「参考」。'
+      : '')
+    + (silentDims.length || refDims.length ? '以上数字均为仿真上界，真实作答只会更低。' : '');
+
+  app.innerHTML = '<section class="screen on" id="result">'
+    + (lowConf ? '<div class="banner">这份作答前后一致性偏低（' + s.conf + '/100），结果仅供参考。建议隔一会儿重测一次，或者换个心情再来。</div>' : '')
+    + '<div class="hero"><img class="rhero" src="' + IMG[top.id].hero + '" alt="' + top.name + '" width="720" height="960">'
+    + '<div class="rname serif">' + top.name + (tie ? ' × ' + second.name : '') + '</div>'
+    + '<div class="rline">' + t.line + '</div>'
+    + '<div class="sim">' + (tie
+        ? '与 ' + top.name + ' / ' + second.name + ' 的剖面相似度都在 ' + pct + '% 上下'
+        : '与 ' + top.name + ' 的剖面相似度 ' + pct + '%｜次位 ' + second.name + ' ' + pct2 + '%') + '</div></div>'
+    + '<div class="tags">' + t.tags.map(function(x){ return '<span class="tg">' + x + '</span>'; }).join('') + '</div>'
+    + '<div class="block"><div class="body">' + t.body + '</div><div class="risk">注意：' + t.risk + '</div></div>'
+    + (role ? '<div class="rolebox"><b>关系角色 · ' + ROLES[role].name + '</b><p>' + ROLES[role].text + '</p>'
+        + '<p style="font-size:12px;color:var(--ink3);margin-top:10px">角色看的是你现在的结构位置（权力 × 交换），不是性格。换一段关系，它可能就变。</p></div>'
+      : '<div class="rolebox"><b>关系角色 · 位置模糊</b><p>' + roleWhy(s.norm) + '，象限归属等于掷硬币——所以我们不给标签。</p></div>')
+    + '<details class="why"><summary>展开：这结果是怎么算出来的</summary>'
+    + '<div class="block"><div class="k">十维剖面</div><div class="dims">' + dimRows + '</div>'
+    + (notes.length ? '<p class="note">' + notes.map(function(p){
+        return '「' + DIMS[p[0]].name + '」和「' + DIMS[p[1]].name + '」在题库里高度共变（r≈' + p[2].toFixed(2) + '），你看到的很可能是<b>同一件事被记了两次账</b>，别当成两条独立结论。';
+      }).join('<br>') + '</p>' : '')
+    + (weakNote ? '<p class="note">' + weakNote + '。以上 α 是仿真上界，真实作答只会更低。</p></div>' : '</div>')
+    + '<div class="block"><div class="k">这三题把你推向了 ' + top.name + '</div>'
+    + ks.map(function(k){
+        const it = ITEMS[k.qi];
+        return '<div class="kc"><div class="t">' + it.tag + '｜' + it.scene.slice(0, 26) + '…</div>'
+          + '<div class="o">' + it.opts[answers[k.qi]].t + '</div>'
+          + '<div class="d">这一题把你的结果' + (k.delta>0 ? '拉向 ' : '拉离 ') + top.name + ' ' + Math.abs(k.delta*100).toFixed(0) + ' 分相似度</div></div>';
+      }).join('') + '</div>'
+    + '</details>'
+    + '<div class="actions"><button class="btn" id="shareBtn">复制结果链接</button>'
+    + '<button class="btn ghost" id="againBtn">再测一次</button>'
+    + '<button class="btn ghost" id="galBtn">看八只狗</button>'
+    + '<button class="btn ghost" id="aboutBtn2">这个结果有多可信</button>'
+    + '<button class="btn ghost" id="exportBtn2">导出我的作答（CSV）</button></div>'
+    + '<div class="foot">娱乐与自我觉察用途，不构成心理诊断。本版本没有服务端：作答只存在你这台设备上，不上传。</div>'
+    + '</section>';
+
+  document.getElementById('shareBtn').onclick = function(){
+    const url = location.href.split('?')[0] + '?r=' + top.id + (role ? '&ro=' + role : '');
+    const txt = '我测出来是「' + top.name + ' · ' + t.line + '」' + (role ? '，关系角色是' + ROLES[role].name : '') + '，你也来测测：' + url;
+    if (navigator.share) { navigator.share({ title:'汪格 WOOF-TI', text:txt, url:url }).catch(function(){}); return; }
+    navigator.clipboard.writeText(txt).then(function(){ alert('已复制，去粘贴给朋友吧'); }).catch(function(){ prompt('复制这个链接：', url); });
+  };
+  document.getElementById('againBtn').onclick = startTest;
+  document.getElementById('galBtn').onclick = gallery;
+  document.getElementById('aboutBtn2').onclick = about;
+  document.getElementById('exportBtn2').onclick = exportCSV;
+}
+
+function gallery(){
+  app.innerHTML = '<section class="screen on" id="gallery"><h1 class="serif" style="font-size:24px">八只狗</h1>'
+    + '<p class="sub">它们不是八个"标准答案"，是八种维持关系的方式。</p>'
+    + Object.keys(PROTO).map(function(id){
+        const t = TEXTS[id];
+        return '<div class="gcard"><img src="' + IMG[id].thumb + '" alt="' + PROTO[id].n + '" width="320" height="427" loading="lazy">'
+          + '<div><div class="gn">' + PROTO[id].n + ' · ' + t.line + '</div>'
+          + '<div class="gl">' + t.tags.join(' / ') + '</div></div></div>';
+      }).join('')
+    + '<div class="actions"><button class="btn ghost" id="backCover">返回</button></div></section>';
+  document.getElementById('backCover').onclick = (answers.length && answers[0]!==null) ? result : cover;
+}
+
+function about(){
+  const weakest = KEYS.filter(function(k){ return RULES.flags[k]; })
+    .map(function(k){ return DIMS[k].name + '（' + (RULES.flags[k].mode === 'silent' ? 'α≈' + RULES.flags[k].alpha30 : 'r≈' + RULES.flags[k].rTrue) + '）'; }).join('、');
+  const topPair = RULES.pairs[0];
+  app.innerHTML = '<section class="screen on" id="about"><h1 class="serif" style="font-size:24px">这个测试有多可信</h1>'
+    + '<p class="sub">我们不打算说"99.6% 准"。那是个内部校验数字，不是准确率。</p>'
+    + '<div class="block"><div class="k">三条我们真正守住的线</div>'
+    + '<p class="note">① <b>瞎选的人不会被告知"高置信"</b>：随机作答被判高置信的比例约 12%，与掷骰子基线持平。<br>'
+    + '② <b>一路点同一个位置没用</b>：每题选项顺序随机，直线作答会被打散。<br>'
+    + '③ <b>不确定时就承认不确定</b>：两型分数接近给双主型；任一轴贴中线时不给关系角色；整份作答一致性偏低时会提示重测。</p></div>'
+    + '<div class="block"><div class="k">已知的短板</div>'
+    + '<p class="note">' + (topPair ? '十维里有几对在题库中高度共变（最突出的是' + DIMS[topPair.a].name + '与' + DIMS[topPair.b].name + '，r≈' + topPair.r.toFixed(2) + '），所以"权力高 + 宜人低"可能是一件事被记了两次账。<br>' : '')
+    + (weakest ? '标注降级的维度：' + weakest + '。silent 的只画条、不给方向；reference 的标签加「·参考」。<br>' : '')
+    + '关系角色用的"权力"一列，目前测的是自我感知的位置，不是客观结构——这一点会在下一代用人内对比题修。</p></div>'
+    + '<div class="block"><div class="k">你的作答数据</div>'
+    + '<p class="note">全部存在本机（localStorage），不上传。你可以随时导出一份 CSV，用来自己核对，或在你参加试测时交回给发起人。题库版本戳：<b>' + DATA.version + '</b>。</p></div>'
+    + '<div class="actions"><button class="btn ghost" id="exportBtn">导出我的作答（CSV）</button>'
+    + '<button class="btn ghost" id="back2">返回</button></div></section>';
+  document.getElementById('back2').onclick = (answers.length && answers[0]!==null) ? result : cover;
+  document.getElementById('exportBtn').onclick = exportCSV;
+}
+
+/* ---------- 本地记录 + CSV 导出 ---------- */
+const LS_KEY = 'wangti.runs';
+function persist(run){
+  try {
+    const arr = JSON.parse(localStorage.getItem(LS_KEY) || '[]');
+    arr.push(run);
+    localStorage.setItem(LS_KEY, JSON.stringify(arr.slice(-60)));
+  } catch (e) {}
+}
+function exportCSV(){
+  let runs = [];
+  try { runs = JSON.parse(localStorage.getItem(LS_KEY) || '[]'); } catch (e) {}
+  if (!runs.length) { alert('本机还没有作答记录。先测一次再来导出。'); return; }
+  const head = ['version','session','finished_at','item_id','item_tag','option_index','option_position','order','ms','since_start_ms'];
+  const rows = [head.join(',')];
+  runs.forEach(function(run){
+    run.items.forEach(function(it, i){
+      rows.push([run.v, run.sid, run.at, it.qid, '"' + (it.tag || '') + '"', it.opt, it.pos, (it.order||[]).join('|'), it.ms, it.ts - run.t0].join(','));
+    });
+  });
+  const blob = new Blob(['\ufeff' + rows.join('\n')], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'wangti-' + DATA.version + '-' + Date.now() + '.csv';
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+
+/* ---------- 好友视角 / 调试入口 ---------- */
+function friendView(dogId, roleKey){
+  if (!PROTO[dogId]) return false;
+  const t = TEXTS[dogId];
+  app.innerHTML = '<section class="screen on"><div class="banner">这是你朋友的结果。你也测一个，看看是不是同一窝。</div>'
+    + '<div class="hero" style="margin-top:24px"><img class="rhero" src="' + IMG[dogId].hero + '" alt="' + PROTO[dogId].n + '" width="720" height="960">'
+    + '<div class="rname serif">' + PROTO[dogId].n + '</div><div class="rline">' + t.line + '</div></div>'
+    + '<div class="tags" style="justify-content:center">' + t.tags.map(function(x){ return '<span class="tg">' + x + '</span>'; }).join('') + '</div>'
+    + '<div class="block"><div class="body">' + t.body + '</div></div>'
+    + (roleKey && ROLES[roleKey] ? '<div class="rolebox"><b>关系角色 · ' + ROLES[roleKey].name + '</b><p>' + ROLES[roleKey].text + '</p></div>' : '')
+    + '<div class="actions"><button class="btn" id="meToo">我也测</button></div></section>';
+  document.getElementById('meToo').onclick = function(){ location.href = location.pathname; };
+  return true;
+}
+
+(function init(){
+  const q = new URLSearchParams(location.search);
+  if (q.get('r') && friendView(q.get('r'), q.get('ro'))) return;
+  if (q.get('p') === 'about') { about(); return; }
+  if (q.get('p') === 'gallery') { gallery(); return; }
+  if (q.get('q')) { startTest(); idx = Math.min(ITEMS.length-1, Math.max(0, parseInt(q.get('q'),10)||0)); renderQ(); return; }
+  if (q.get('a')) {
+    const arr = q.get('a').split(',').map(function(x){ return parseInt(x,10)||0; });
+    startTest();
+    answers = ITEMS.map(function(_,i){ return (arr[i] !== undefined ? arr[i] : 0) % 3; });
+    result(); return;
+  }
+  cover();
+})();
+</script>
+</body></html>
